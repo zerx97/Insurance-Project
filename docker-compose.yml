@@ -27,7 +27,6 @@ services:
   # to depend on for a real project. This image gives you a pinned, stable version instead.
   kafka:
     image: apache/kafka:3.7.0
-    container_name: kafka
     ports:
       - "9092:9092"
     environment:
