@@ -46,11 +46,24 @@ app.use((err, req, res, next) => {
 
 async function start() {
   await initSchema();
-  try {
-    await startClaimScoreConsumer();
-  } catch (err) {
-    console.error('Kafka consumer failed to start (continuing without it):', err.message);
+
+  const MAX_RETRIES = 10;
+  const RETRY_DELAY_MS = 5000;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      await startClaimScoreConsumer();
+      console.log('claims-service: connected to Kafka, listening for claim.scored');
+      break;
+    } catch (err) {
+      console.error(`Kafka consumer failed to start (attempt ${attempt}/${MAX_RETRIES}): ${err.message}`);
+      if (attempt === MAX_RETRIES) {
+        console.error('Giving up on Kafka connection after max retries. Restart the container to try again.');
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      }
+    }
   }
+
   app.listen(PORT, () => console.log(`claims-service listening on port ${PORT}`));
 }
 
