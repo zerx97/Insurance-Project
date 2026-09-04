@@ -174,6 +174,35 @@ Being honest about this, the way you asked:
 
 ---
 
+## Part 7 — Real bugs that came up, and what they teach you
+
+This project didn't just work perfectly the first time — and that's actually useful, because chasing these down is 90% of what a real DevOps job is. Here's every real problem that came up when actually running this, in plain English:
+
+- **Bitnami's Kafka image stopped being free** — in 2025, Bitnami moved almost all of their versioned Docker images behind a paywall, leaving only a moving `latest` tag on the free tier. We switched to `apache/kafka`, the official image from the Kafka project itself — more stable, and a better long-term choice anyway.
+- **`init-db.sh` connected to the wrong database** — the script that creates your 4 databases forgot to say *which* database to connect to first, so it defaulted to one that didn't exist. Classic one-line bug: needed `--dbname postgres` added.
+- **A shell bug silently deleted 6 files** — while building auth-service, a folder-creation command failed quietly, and the files meant for those folders were never written. Nothing said "error" loudly enough — it just meant `AuthController.java` was calling classes that didn't exist. Lesson: when something looks like it "worked," double-check the actual files on disk.
+- **CORS wasn't set up** — none of the backend services said "yes, the website is allowed to talk to me." Browsers block that silently by default, so the frontend showed a vague "Registration failed" with no real reason why. Every backend service now explicitly allows requests from the frontend.
+- **`kafka-python` doesn't work on Python 3.12** — the library fraud-detection-service used to talk to Kafka is old and unmaintained, and breaks on newer Python. Swapped to `kafka-python-ng`, a maintained replacement with the exact same code interface.
+- **Services gave up on Kafka after one failed try** — if notification-service or claims-service couldn't reach Kafka on their very first attempt (which can happen for a few seconds while everything is still starting up), they just gave up forever instead of trying again. Now they retry automatically.
+- **A hardcoded container name caused a collision** — one line in `docker-compose.yml` forced Kafka's container to always be named exactly `kafka`. Container names have to be unique on your whole computer, not just inside one project, so if an old copy of the project was still running in the background, starting a new copy would collide with it. Removed the hardcoded name — Docker Compose names containers safely on its own.
+
+None of these mean the project is "broken" — they're the completely normal, expected experience of running a real multi-service system for the first time. A big part of being a DevOps engineer is being calm and methodical when you hit exactly this kind of thing.
+
+---
+
+## Part 8 — The frontend got a full redesign
+
+The original frontend used a plain "paper document" look — cream background, simple black text, no photos, no motion. It worked, but it looked exactly like what it was: a first draft. It's since been rebuilt with a "deep space" theme:
+
+- **Real photos, not fake ones** — the hero background, the login/register pages, and the four policy-type cards (Auto/Home/Life/Health) all use real photographs pulled live from NASA's public APIs (their Image Library and Astronomy Picture of the Day). These images are public domain, meaning free to use with zero legal risk, and they're hosted on NASA's own servers, so the links won't randomly break like some random image site might.
+- **A moving starfield** — small twinkling stars plus the occasional shooting star, running quietly in the background on every single page, not just the homepage.
+- **Color-coded categories** — Auto, Home, Life, and Health each got their own color (amber, cyan, violet, pink) and their own hand-drawn icon, used consistently everywhere that policy type shows up, so your eye learns to recognize them.
+- **Everything animates in** — policies, claims, and invoices fade and slide into place as they load instead of just appearing instantly; buttons and cards react when you hover over them.
+
+If you ever want to go back and see exactly how the plain version differed from this one, it's all saved in the project's git history — every version along the way, including this one, is a separate commit you can look at.
+
+---
+
 ## Quick reference — where everything lives in this repo
 
 ```
