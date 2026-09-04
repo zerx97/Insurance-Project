@@ -1,5 +1,7 @@
 import { useEffect, useState, FormEvent } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { policyApi } from '../api/client';
+import { categoryIcon } from '../components/icons/PolicyIcons';
 
 interface Policy {
   id: number;
@@ -97,19 +99,30 @@ export default function Policies() {
         <p className="empty-state">No policies yet. Create your first one above.</p>
       ) : (
         <div className="ledger">
-          {policies.map((p) => (
-            <div className="ledger-row" key={p.id}>
-              <div className="label">{p.policyType} · {p.policyNumber}</div>
-              <div className="primary">Coverage ${Number(p.coverageAmount).toLocaleString()}</div>
-              <div className="amount">${Number(p.monthlyPremium).toFixed(2)}/mo</div>
-              <div className="meta">
-                {p.startDate} → {p.endDate}
-                <span className={`status-tag ${p.status.toLowerCase()}`} style={{ marginLeft: '0.75rem' }}>
-                  {p.status}
-                </span>
-              </div>
-            </div>
-          ))}
+          <AnimatePresence>
+            {policies.map((p, i) => (
+              <motion.div
+                className="ledger-row with-icon"
+                key={p.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: i * 0.05 }}
+              >
+                <div className="ledger-icon">{categoryIcon(p.policyType)}</div>
+                <div className="row-content">
+                  <div className="label">{p.policyType} · {p.policyNumber}</div>
+                  <div className="primary">Coverage ${Number(p.coverageAmount).toLocaleString()}</div>
+                  <div className="amount">${Number(p.monthlyPremium).toFixed(2)}/mo</div>
+                  <div className="meta">
+                    {p.startDate} → {p.endDate}
+                    <span className={`status-tag ${p.status.toLowerCase()}`} style={{ marginLeft: '0.75rem' }}>
+                      {p.status}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
     </>

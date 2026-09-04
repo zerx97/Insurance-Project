@@ -1,5 +1,7 @@
 import { useEffect, useState, FormEvent } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { claimsApi } from '../api/client';
+import { categoryIcon } from '../components/icons/PolicyIcons';
 
 interface Claim {
   id: number;
@@ -101,19 +103,30 @@ export default function Claims() {
         <p className="empty-state">No claims filed yet.</p>
       ) : (
         <div className="ledger">
-          {claims.map((c) => (
-            <div className="ledger-row" key={c.id}>
-              <div className="label">{c.claim_type} · {c.claim_number} · policy {c.policy_number}</div>
-              <div className="primary">{c.description}</div>
-              <div className="amount">${Number(c.amount_claimed).toFixed(2)}</div>
-              <div className="meta">
-                <span className={`status-tag ${c.status.toLowerCase()}`}>{c.status}</span>
-                {c.fraud_score !== null && (
-                  <span style={{ marginLeft: '0.75rem' }}>Fraud score: {c.fraud_score}</span>
-                )}
-              </div>
-            </div>
-          ))}
+          <AnimatePresence>
+            {claims.map((c, i) => (
+              <motion.div
+                className="ledger-row with-icon"
+                key={c.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: i * 0.05 }}
+              >
+                <div className="ledger-icon">{categoryIcon(c.claim_type)}</div>
+                <div className="row-content">
+                  <div className="label">{c.claim_type} · {c.claim_number} · policy {c.policy_number}</div>
+                  <div className="primary">{c.description}</div>
+                  <div className="amount">${Number(c.amount_claimed).toFixed(2)}</div>
+                  <div className="meta">
+                    <span className={`status-tag ${c.status.toLowerCase()}`}>{c.status}</span>
+                    {c.fraud_score !== null && (
+                      <span style={{ marginLeft: '0.75rem' }}>Fraud score: {c.fraud_score}</span>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
     </>
