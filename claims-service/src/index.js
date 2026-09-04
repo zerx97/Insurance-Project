@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import pinoHttp from 'pino-http';
 import client from 'prom-client';
 import claimsRouter from './routes/claims.js';
@@ -9,6 +10,9 @@ import { startClaimScoreConsumer } from './kafka/consumer.js';
 const app = express();
 const PORT = process.env.PORT || 8084;
 
+// Without this, the browser blocks every request the React frontend makes to claims-service -
+// same reasoning as the CORS beans added to the Java services' SecurityConfig.
+app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:3000' }));
 app.use(express.json());
 app.use(pinoHttp());
 
