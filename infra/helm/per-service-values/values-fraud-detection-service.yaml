@@ -1,0 +1,16 @@
+# This service runs on an EKS Fargate profile (see Terraform notes), not the regular
+# EC2 node group - resources are set lower and more precisely since Fargate bills per-pod.
+image:
+  repository: 110425445190.dkr.ecr.us-east-1.amazonaws.com/insurenext-fraud-detection-service
+  tag: latest
+service:
+  port: 8086
+livenessProbe:
+  path: /health
+readinessProbe:
+  path: /health
+resources:
+  requests: { cpu: 250m, memory: 512Mi }
+  limits: { cpu: 500m, memory: 1Gi }
+env:
+  KAFKA_BROKERS: "b-1.insurenext-prod.xxxxx.kafka.us-east-1.amazonaws.com:9092"

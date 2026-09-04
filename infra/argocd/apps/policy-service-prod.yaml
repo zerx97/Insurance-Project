@@ -1,0 +1,21 @@
+# Contrast with auth-service.yaml above: this prod Application has NO `automated:` block.
+# ArgoCD will show it as "OutOfSync" whenever the config repo changes, but will wait for
+# a human to run `argocd app sync policy-service-prod` (or click Sync in the UI) -
+# this is the manual approval gate for production, GitOps-style.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: policy-service-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_ORG/insurenext-config.git
+    targetRevision: main
+    path: helm/insurenext-service
+    helm:
+      valueFiles:
+        - ../per-service-values/values-policy-service.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: insurenext-prod

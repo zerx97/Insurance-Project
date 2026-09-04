@@ -1,0 +1,218 @@
+:root {
+  --ink: #12213A;
+  --ink-soft: #1C3357;
+  --parchment: #F0EAD8;
+  --parchment-dim: #E4DCC4;
+  --brass: #B08D57;
+  --brass-bright: #C9A46B;
+  --line: rgba(18, 33, 58, 0.16);
+  --danger: #8C3A3A;
+  --ok: #3A6B4C;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  background: var(--parchment);
+  color: var(--ink);
+}
+
+h1, h2, h3 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+a { color: inherit; }
+
+.app-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  background: var(--ink);
+  color: var(--parchment);
+  padding: 1.1rem 2rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--brass);
+}
+
+.top-bar .brand {
+  font-family: 'Source Serif 4', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.top-bar nav {
+  display: flex;
+  gap: 1.75rem;
+  font-size: 0.95rem;
+}
+
+.top-bar nav a, .top-bar button {
+  background: none;
+  border: none;
+  color: var(--parchment-dim);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-family: inherit;
+  text-decoration: none;
+}
+
+.top-bar nav a:hover, .top-bar button:hover {
+  color: var(--brass-bright);
+}
+
+main.content {
+  flex: 1;
+  max-width: 780px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  margin-bottom: 0.4rem;
+}
+
+.page-subtitle {
+  color: var(--ink-soft);
+  opacity: 0.75;
+  margin-bottom: 2.5rem;
+  font-size: 0.98rem;
+}
+
+.ledger {
+  border-top: 2px solid var(--ink);
+}
+
+.ledger-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 1.5rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+
+.ledger-row .label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  opacity: 0.6;
+  grid-column: 1 / -1;
+}
+
+.ledger-row .primary {
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.ledger-row .meta {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  opacity: 0.75;
+  grid-column: 1 / -1;
+}
+
+.ledger-row .amount {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.status-tag {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.75rem;
+  border: 1px solid currentColor;
+  margin-top: 0.35rem;
+}
+
+.status-tag.active, .status-tag.approved, .status-tag.paid { color: var(--ok); }
+.status-tag.pending, .status-tag.submitted, .status-tag.under_review { color: var(--brass); }
+.status-tag.cancelled, .status-tag.overdue { color: var(--danger); }
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-width: 460px;
+}
+
+label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+}
+
+textarea { min-height: 90px; resize: vertical; }
+
+button.primary {
+  align-self: flex-start;
+  background: var(--ink);
+  color: var(--parchment);
+  border: none;
+  padding: 0.7rem 1.6rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 0.4rem;
+}
+
+button.primary:hover { background: var(--ink-soft); }
+button.primary:disabled { opacity: 0.5; cursor: default; }
+
+.error-banner {
+  border-left: 3px solid var(--danger);
+  padding: 0.7rem 1rem;
+  background: rgba(140, 58, 58, 0.08);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state {
+  padding: 3rem 0;
+  text-align: left;
+  color: var(--ink-soft);
+  opacity: 0.7;
+  font-size: 0.95rem;
+}
+
+.auth-card {
+  max-width: 400px;
+  margin: 4rem auto;
+  padding: 2.5rem;
+  background: #fff;
+  border-top: 3px solid var(--brass);
+}
+
+.auth-card h1 { margin-bottom: 0.3rem; font-size: 1.6rem; }
+.auth-card p.sub { color: var(--ink-soft); opacity: 0.7; margin-bottom: 2rem; font-size: 0.9rem; }
+
+.switch-link { margin-top: 1.5rem; font-size: 0.88rem; }
+.switch-link button { background: none; border: none; text-decoration: underline; cursor: pointer; font-family: inherit; color: var(--ink); padding: 0; }

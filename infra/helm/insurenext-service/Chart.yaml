@@ -1,0 +1,10 @@
+apiVersion: v2
+name: insurenext-service
+description: >
+  A generic, reusable Helm chart for any InsureNext microservice. One chart, deployed
+  7 times with different values.yaml files (one per service) - this is the real production
+  pattern: you almost never write 7 near-identical charts, you write ONE chart and vary
+  the values. Kustomize (mentioned in the docs) then layers per-environment overrides
+  (replica counts, resource limits) on TOP of whichever values file is used.
+version: 1.0.0
+appVersion: "1.0.0"

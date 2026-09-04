@@ -1,0 +1,111 @@
+name: InsureNext CI/CD
+
+# Same shape as the ShopNest pipeline: build -> test -> scan -> containerize -> scan image ->
+# push -> (staging deploy happens via ArgoCD watching the config repo, not from here directly)
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 110425445190.dkr.ecr.us-east-1.amazonaws.com
+
+jobs:
+  build-java-services:
+    strategy:
+      matrix:
+        service: [auth-service, policy-service, billing-service]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Build and test
+        working-directory: ./${{ matrix.service }}
+        run: mvn -B clean verify
+
+  build-node-services:
+    strategy:
+      matrix:
+        service: [claims-service, notification-service, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: ${{ matrix.service }}/package-lock.json
+      - name: Install and test
+        working-directory: ./${{ matrix.service }}
+        run: |
+          npm install
+          npm test --if-present
+
+  build-python-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and test
+        working-directory: ./fraud-detection-service
+        run: |
+          pip install -r requirements-dev.txt
+          pytest
+
+  security-scan:
+    needs: [build-java-services, build-node-services, build-python-service]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # SonarQube (SAST) would run here per-service against a self-hosted or SonarCloud instance;
+      # omitted from this public workflow because it needs an org-specific SONAR_TOKEN secret.
+      - name: Dependency scan (Snyk) - placeholder
+        run: echo "Wire up SNYK_TOKEN as a repo secret, then run 'snyk test' per service here"
+
+  docker-build-and-push:
+    needs: [security-scan]
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        service: [auth-service, policy-service, billing-service, claims-service, notification-service, fraud-detection-service, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::110425445190:role/github-actions-ecr-push
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image
+        working-directory: ./${{ matrix.service }}
+        run: docker build -t $ECR_REGISTRY/insurenext-${{ matrix.service }}:${{ github.sha }} .
+
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.ECR_REGISTRY }}/insurenext-${{ matrix.service }}:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          exit-code: '1'
+
+      - name: Push image
+        run: docker push $ECR_REGISTRY/insurenext-${{ matrix.service }}:${{ github.sha }}
+
+      - name: Update config repo image tag (GitOps trigger)
+        run: |
+          echo "In a real setup: clone the separate insurenext-config repo, "
+          echo "bump the image tag in helm/values-${{ matrix.service }}.yaml, commit, push."
+          echo "ArgoCD (watching that repo) picks up the change from there - this job"
+          echo "never touches the cluster directly."

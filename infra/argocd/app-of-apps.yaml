@@ -1,0 +1,21 @@
+# The "App of Apps" pattern: one ArgoCD Application that itself points to a folder
+# containing all the OTHER Application manifests. You apply this ONE file manually,
+# once, and ArgoCD takes it from there - every other service's Application is
+# created/updated/deleted automatically as files in argocd/apps/ change.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: insurenext-app-of-apps
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_ORG/insurenext-config.git
+    targetRevision: main
+    path: argocd/apps
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

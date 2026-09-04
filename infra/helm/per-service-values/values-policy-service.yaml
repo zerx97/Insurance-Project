@@ -1,0 +1,10 @@
+image:
+  repository: 110425445190.dkr.ecr.us-east-1.amazonaws.com/insurenext-policy-service
+  tag: latest
+service:
+  port: 8082
+env:
+  DB_HOST: "insurenext-prod-postgres.xxxxx.us-east-1.rds.amazonaws.com"
+  DB_NAME: "insurenext_policy"
+  REDIS_HOST: "insurenext-prod-redis.xxxxx.cache.amazonaws.com"
+  KAFKA_BROKERS: "b-1.insurenext-prod.xxxxx.kafka.us-east-1.amazonaws.com:9092"

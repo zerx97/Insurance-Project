@@ -1,0 +1,44 @@
+# Default values - every per-service values file (values-auth-service.yaml, etc.) overrides
+# only what's different, inheriting everything else from here.
+replicaCount: 2
+
+image:
+  repository: CHANGE_ME
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  port: 8080
+  type: ClusterIP
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+livenessProbe:
+  path: /actuator/health/liveness
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  path: /actuator/health/readiness
+  initialDelaySeconds: 15
+  periodSeconds: 5
+
+env: {}
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+serviceAccount:
+  create: true
+  # For real AWS deployments: annotate with an IRSA role ARN here so this pod gets
+  # temporary AWS credentials instead of static keys baked into env vars.
+  annotations: {}

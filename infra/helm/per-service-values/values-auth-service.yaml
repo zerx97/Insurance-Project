@@ -1,0 +1,12 @@
+image:
+  repository: 110425445190.dkr.ecr.us-east-1.amazonaws.com/insurenext-auth-service
+  tag: latest
+service:
+  port: 8081
+livenessProbe:
+  path: /actuator/health/liveness
+readinessProbe:
+  path: /actuator/health/readiness
+env:
+  DB_HOST: "insurenext-prod-postgres.xxxxx.us-east-1.rds.amazonaws.com"
+  DB_NAME: "insurenext_auth"

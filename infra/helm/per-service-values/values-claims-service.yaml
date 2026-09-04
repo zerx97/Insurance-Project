@@ -1,0 +1,15 @@
+# Node.js services use a plain /health path, not /actuator/health/* like Spring Boot -
+# this is exactly why the base chart's probe paths are overridable per service, not hardcoded.
+image:
+  repository: 110425445190.dkr.ecr.us-east-1.amazonaws.com/insurenext-claims-service
+  tag: latest
+service:
+  port: 8084
+livenessProbe:
+  path: /health
+readinessProbe:
+  path: /health/ready
+env:
+  DB_HOST: "insurenext-prod-postgres.xxxxx.us-east-1.rds.amazonaws.com"
+  DB_NAME: "insurenext_claims"
+  KAFKA_BROKERS: "b-1.insurenext-prod.xxxxx.kafka.us-east-1.amazonaws.com:9092"
