@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { authApi } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { ShieldIcon } from '../components/icons/PolicyIcons';
+import Starfield from '../components/Starfield';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -31,6 +32,9 @@ export default function Login() {
   return (
     <div className="auth-shell">
       <div className="auth-visual">
+        <div className="hero-bg-photo" style={{ backgroundImage: `url(https://apod.nasa.gov/apod/image/2609/noirlab2621a_1024.jpg)` }} />
+        <div className="hero-bg-scrim" />
+        <Starfield density={45} />
         <ShieldIcon size={56} />
         <blockquote>
           "Every policy issued publishes an event. Nothing waits on a human to notice it."

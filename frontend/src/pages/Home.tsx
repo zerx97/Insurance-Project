@@ -3,13 +3,34 @@ import type { CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import HeroIllustration from '../components/icons/HeroIllustration';
+import Starfield from '../components/Starfield';
 import { AutoIcon, HomeIcon, LifeIcon, HealthIcon } from '../components/icons/PolicyIcons';
 
+// Real NASA photography (public domain, via NASA's Image & Video Library / APOD APIs) -
+// stable CDN URLs, no licensing risk. Each category's thumbnail is tinted with its own
+// accent color in CSS (color-mix over the photo) so the palette stays cohesive regardless
+// of the source image's original hue.
 const categories = [
-  { key: 'AUTO', title: 'Auto', color: 'var(--cat-auto)', icon: <AutoIcon size={34} />, copy: 'Cover your vehicle in minutes — coverage amount and start date, nothing else.' },
-  { key: 'HOME', title: 'Home', color: 'var(--cat-home)', icon: <HomeIcon size={34} />, copy: 'Protect where you live, with a premium calculated the moment you apply.' },
-  { key: 'LIFE', title: 'Life', color: 'var(--cat-life)', icon: <LifeIcon size={34} />, copy: 'Long-term coverage, issued instantly, no paperwork mailed back and forth.' },
-  { key: 'HEALTH', title: 'Health', color: 'var(--cat-health)', icon: <HealthIcon size={34} />, copy: 'Health coverage that files, tracks, and scores claims automatically.' },
+  {
+    key: 'AUTO', title: 'Auto', color: 'var(--cat-auto)', icon: <AutoIcon size={30} />,
+    copy: 'Cover your vehicle in minutes — coverage amount and start date, nothing else.',
+    image: 'https://images-assets.nasa.gov/image/PIA26461/PIA26461~large.jpg',
+  },
+  {
+    key: 'HOME', title: 'Home', color: 'var(--cat-home)', icon: <HomeIcon size={30} />,
+    copy: 'Protect where you live, with a premium calculated the moment you apply.',
+    image: 'https://images-assets.nasa.gov/image/PIA26434/PIA26434~large.jpg',
+  },
+  {
+    key: 'LIFE', title: 'Life', color: 'var(--cat-life)', icon: <LifeIcon size={30} />,
+    copy: 'Long-term coverage, issued instantly, no paperwork mailed back and forth.',
+    image: 'https://images-assets.nasa.gov/image/PIA26436/PIA26436~large.jpg',
+  },
+  {
+    key: 'HEALTH', title: 'Health', color: 'var(--cat-health)', icon: <HealthIcon size={30} />,
+    copy: 'Health coverage that files, tracks, and scores claims automatically.',
+    image: 'https://images-assets.nasa.gov/image/PIA26105/PIA26105~small.jpg',
+  },
 ];
 
 const steps = [
@@ -30,6 +51,10 @@ export default function Home() {
   return (
     <>
       <section className="hero-section">
+        <div className="hero-bg-photo" style={{ backgroundImage: `url(https://apod.nasa.gov/apod/image/2609/noirlab2621a_1024.jpg)` }} />
+        <div className="hero-bg-scrim" />
+        <Starfield density={70} />
+
         <div className="hero-grid">
           <motion.div initial="hidden" animate="show" variants={fadeUp}>
             <div className="hero-eyebrow">INSURENEXT · CLAIMS, BILLING & POLICIES</div>
@@ -64,11 +89,15 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.45, delay: i * 0.08 }}
-            whileHover={{ y: -4 }}
+            whileHover={{ y: -5 }}
           >
-            {c.icon}
-            <h3>{c.title}</h3>
-            <p>{c.copy}</p>
+            <div className="category-media" style={{ backgroundImage: `url(${c.image})` }}>
+              <div className="icon-badge">{c.icon}</div>
+            </div>
+            <div className="category-body">
+              <h3 style={{ marginTop: '0.4rem' }}>{c.title}</h3>
+              <p>{c.copy}</p>
+            </div>
           </motion.div>
         ))}
       </div>

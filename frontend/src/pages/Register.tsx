@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { authApi } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { ShieldIcon } from '../components/icons/PolicyIcons';
+import Starfield from '../components/Starfield';
 
 export default function Register() {
   const [fullName, setFullName] = useState('');
@@ -32,6 +33,9 @@ export default function Register() {
   return (
     <div className="auth-shell">
       <div className="auth-visual">
+        <div className="hero-bg-photo" style={{ backgroundImage: `url(https://images-assets.nasa.gov/image/PIA26434/PIA26434~large.jpg)` }} />
+        <div className="hero-bg-scrim" />
+        <Starfield density={45} />
         <ShieldIcon size={56} />
         <blockquote>
           "A claim is scored the second it's submitted — not reviewed three days later."

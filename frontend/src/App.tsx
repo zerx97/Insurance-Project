@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import TopBar from './components/TopBar';
 import ProtectedRoute from './components/ProtectedRoute';
+import Starfield from './components/Starfield';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -16,6 +17,7 @@ function PageWrap({ children }: { children: ReactNode }) {
 export default function App() {
   return (
     <div className="app-shell">
+      <Starfield density={50} />
       <TopBar />
       <main className="content">
         <Routes>
