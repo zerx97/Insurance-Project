@@ -72,7 +72,7 @@ jobs:
 
   docker-build-and-push:
     needs: [security-scan]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.AWS_DEPLOY_ENABLED == 'true'
     strategy:
       matrix:
         service: [auth-service, policy-service, billing-service, claims-service, notification-service, fraud-detection-service, frontend]
