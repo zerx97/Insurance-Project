@@ -2,6 +2,7 @@ import { useEffect, useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { policyApi } from '../api/client';
 import { categoryIcon } from '../components/icons/PolicyIcons';
+import { formatCurrency, formatCoverage } from '../utils/format';
 
 interface Policy {
   id: number;
@@ -111,8 +112,8 @@ export default function Policies() {
                 <div className="ledger-icon">{categoryIcon(p.policyType)}</div>
                 <div className="row-content">
                   <div className="label">{p.policyType} · {p.policyNumber}</div>
-                  <div className="primary">Coverage ${Number(p.coverageAmount).toLocaleString()}</div>
-                  <div className="amount">${Number(p.monthlyPremium).toFixed(2)}/mo</div>
+                  <div className="primary">Coverage {formatCoverage(Number(p.coverageAmount))}</div>
+                  <div className="amount">{formatCurrency(Number(p.monthlyPremium))}/mo</div>
                   <div className="meta">
                     {p.startDate} → {p.endDate}
                     <span className={`status-tag ${p.status.toLowerCase()}`} style={{ marginLeft: '0.75rem' }}>

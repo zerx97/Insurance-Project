@@ -2,6 +2,7 @@ import { useEffect, useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { claimsApi } from '../api/client';
 import { categoryIcon } from '../components/icons/PolicyIcons';
+import { formatCurrency } from '../utils/format';
 
 interface Claim {
   id: number;
@@ -116,7 +117,7 @@ export default function Claims() {
                 <div className="row-content">
                   <div className="label">{c.claim_type} · {c.claim_number} · policy {c.policy_number}</div>
                   <div className="primary">{c.description}</div>
-                  <div className="amount">${Number(c.amount_claimed).toFixed(2)}</div>
+                  <div className="amount">{formatCurrency(Number(c.amount_claimed))}</div>
                   <div className="meta">
                     <span className={`status-tag ${c.status.toLowerCase()}`}>{c.status}</span>
                     {c.fraud_score !== null && (

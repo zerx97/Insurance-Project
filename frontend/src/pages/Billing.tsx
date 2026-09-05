@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { billingApi } from '../api/client';
 import { ShieldIcon } from '../components/icons/PolicyIcons';
+import { formatCurrency } from '../utils/format';
 
 interface Invoice {
   id: number;
@@ -65,7 +66,7 @@ export default function Billing() {
                 <div className="row-content">
                   <div className="label">Policy {inv.policyNumber}</div>
                   <div className="primary">Due {inv.dueDate}</div>
-                  <div className="amount">${Number(inv.amountDue).toFixed(2)}</div>
+                  <div className="amount">{formatCurrency(Number(inv.amountDue))}</div>
                   <div className="meta">
                     <span className={`status-tag ${inv.status.toLowerCase()}`}>{inv.status}</span>
                     {inv.status === 'PENDING' && (
