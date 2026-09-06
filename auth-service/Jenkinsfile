@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    environment {
+        ECR_REGISTRY = "110425445190.dkr.ecr.us-east-1.amazonaws.com"
+        IMAGE_NAME   = "insurenext-auth-service"
+        GIT_SHA      = "${env.GIT_COMMIT.take(7)}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+
+        stage('Build & Unit Test') {
+            steps {
+                dir('auth-service') {
+                    sh 'mvn clean verify'
+                }
+            }
+        }
+
+        stage('SonarCloud Scan') {
+    steps {
+        dir('auth-service') {
+            withSonarQubeEnv('SonarCloud') {
+                sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=zerx97_Insurance-Project -Dsonar.organization=zerx97'
+            }
+        }
+    }
+}
+
+        stage('OWASP Dependency-Check') {
+            steps {
+                dir('auth-service') {
+                    dependencyCheck additionalArguments: '--scan . --format ALL', odcInstallation: 'DP-Check'
+                }
+            }
+            post {
+                always {
+                    dependencyCheckPublisher pattern: 'auth-service/dependency-check-report.xml'
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dir('auth-service') {
+                    sh "docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:${GIT_SHA} ."
+                }
+            }
+        }
+
+        stage('Trivy Image Scan') {
+            steps {
+                sh "trivy image --severity HIGH,CRITICAL --exit-code 1 ${ECR_REGISTRY}/${IMAGE_NAME}:${GIT_SHA}"
+            }
+        }
+
+        stage('Generate SBOM') {
+            steps {
+                sh "trivy image --format cyclonedx --output sbom-${GIT_SHA}.json ${ECR_REGISTRY}/${IMAGE_NAME}:${GIT_SHA}"
+                archiveArtifacts artifacts: "sbom-${GIT_SHA}.json"
+            }
+        }
+
+        stage('Push to ECR') {
+            steps {
+                sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                sh "docker push ${ECR_REGISTRY}/${IMAGE_NAME}:${GIT_SHA}"
+            }
+        }
+    }
+}
