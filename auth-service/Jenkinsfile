@@ -7,6 +7,10 @@ pipeline {
         GIT_SHA      = "${env.GIT_COMMIT.take(7)}"
     }
 
+    tools {
+        maven 'Maven'   // must match the name you gave in Jenkins Tool
+    }
+
     stages {
         stage('Checkout') {
             steps { checkout scm }
