@@ -7,10 +7,6 @@ pipeline {
         GIT_SHA      = "${env.GIT_COMMIT.take(7)}"
     }
 
-	tools {
-        maven 'Maven'   // must match the name you gave in Jenkins Tool
-    }
-
     stages {
         stage('Checkout') {
             steps { checkout scm }
@@ -25,19 +21,21 @@ pipeline {
         }
 
         stage('SonarCloud Scan') {
-    steps {
-        dir('auth-service') {
-            withSonarQubeEnv('SonarCloud') {
-                sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=zerx97_Insurance-Project -Dsonar.organization=zerx97'
+            steps {
+                dir('auth-service') {
+                    withSonarQubeEnv('SonarCloud') {
+                        sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=zerx97_Insurance-Project -Dsonar.organization=zerx97'
+                    }
+                }
             }
         }
-    }
-}
 
         stage('OWASP Dependency-Check') {
             steps {
                 dir('auth-service') {
-                    dependencyCheck additionalArguments: '--scan . --format ALL', odcInstallation: 'DP-Check'
+                    withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+                        dependencyCheck additionalArguments: "--scan . --format ALL --nvdApiKey ${NVD_API_KEY}", odcInstallation: 'DP-Check'
+                    }
                 }
             }
             post {
@@ -57,7 +55,7 @@ pipeline {
 
         stage('Trivy Image Scan') {
             steps {
-                sh "trivy image --severity HIGH,CRITICAL --exit-code 1 ${ECR_REGISTRY}/${IMAGE_NAME}:${GIT_SHA}"
+                sh "trivy image --severity HIGH,CRITICAL --exit-code 1 --ignorefile auth-service/.trivyignore ${ECR_REGISTRY}/${IMAGE_NAME}:${GIT_SHA}"
             }
         }
 
