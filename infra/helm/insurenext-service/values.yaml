@@ -42,3 +42,6 @@ serviceAccount:
   # For real AWS deployments: annotate with an IRSA role ARN here so this pod gets
   # temporary AWS credentials instead of static keys baked into env vars.
   annotations: {}
+
+ingress:
+  enabled: false
